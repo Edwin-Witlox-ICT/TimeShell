@@ -1,0 +1,23 @@
+{
+  "name": "timeshell",
+  "version": "1.0.0",
+  "main": "timeshell.js",
+  "bin": {
+    "timeshell": "./timeshell.js"
+  },
+  "scripts": {
+    "start": "node timeshell.js",
+    "login": "node timeshell.js login",
+    "status": "node timeshell.js status",
+    "book": "node timeshell.js book",
+    "editor": "node timeshell.js editor"
+  },
+  "keywords": ["timebox", "time-tracking", "automation", "playwright"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "description": "Browser automation for time-box.eu time tracking",
+  "dependencies": {
+    "playwright": "^1.59.1"
+  }
+}
