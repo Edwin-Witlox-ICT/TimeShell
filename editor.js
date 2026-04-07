@@ -350,7 +350,38 @@ function getHTML() {
     font-size: 14px;
   }
 
-  /* ── Status bar ── */
+  /* ── Toast notification (fixed top-right) ── */
+  .toast {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 9999;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 8px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s, transform 0.3s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .toast.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .toast.success {
+    color: var(--green);
+    background: #0d2818;
+    border: 1px solid #238636;
+  }
+  .toast.error {
+    color: var(--red);
+    background: #2d1214;
+    border: 1px solid #f85149;
+  }
+
+  /* ── Status bar (week summary only) ── */
   .status-bar {
     margin-top: 16px;
     display: flex;
@@ -358,25 +389,6 @@ function getHTML() {
     gap: 16px;
     flex-wrap: wrap;
   }
-  .status-msg {
-    font-size: 14px;
-    font-weight: 600;
-    padding: 8px 16px;
-    border-radius: 6px;
-    transition: opacity 0.4s;
-  }
-  .status-msg.success {
-    color: var(--green);
-    background: #0d2818;
-    border: 1px solid #238636;
-  }
-  .status-msg.error {
-    color: var(--red);
-    background: #2d1214;
-    border: 1px solid #f85149;
-  }
-  @keyframes fade-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-  .status-msg.show { animation: fade-in 0.25s ease-out; }
   .week-summary {
     font-size: 13px;
     color: var(--text-muted);
@@ -463,9 +475,11 @@ function getHTML() {
 
   <!-- Status bar -->
   <div class="status-bar">
-    <span class="status-msg" id="status-msg"></span>
     <span class="week-summary" id="week-summary"></span>
   </div>
+
+  <!-- Fixed toast notification -->
+  <div class="toast" id="toast"></div>
 
   <div class="hint">
     <kbd>Tab</kbd> between cells &middot;
@@ -678,14 +692,15 @@ async function newTemplate() {
 }
 
 function showStatus(msg, type) {
-  const el = document.getElementById('status-msg');
+  const el = document.getElementById('toast');
   el.textContent = (type === 'success' ? 'OK -- ' : '') + msg;
-  el.className = 'status-msg ' + type + ' show';
-  el.style.opacity = '1';
+  el.className = 'toast ' + type;
+  // Trigger reflow then show
+  void el.offsetWidth;
+  el.classList.add('visible');
   clearTimeout(el._timer);
   el._timer = setTimeout(() => {
-    el.style.opacity = '0';
-    setTimeout(() => { el.textContent = ''; el.className = 'status-msg'; }, 400);
+    el.classList.remove('visible');
   }, 4000);
 }
 
