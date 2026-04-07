@@ -578,7 +578,7 @@ function renderEntries() {
       const h = e.days?.[day] || 0;
       rowTotal += h;
       const cls = h > 0 ? 'has-value' : '';
-      tr.innerHTML += '<td class="day-cell"><input type="number" min="0" max="24" step="0.5" class="field-day ' + cls + '" data-day="' + day + '" value="' + (h || '') + '"></td>';
+      tr.innerHTML += '<td class="day-cell"><input type="number" min="0" max="24" step="0.25" class="field-day ' + cls + '" data-day="' + day + '" value="' + (h || '') + '"></td>';
     }
     // Row total
     tr.innerHTML += '<td class="total-cell row-total">' + (rowTotal || '-') + '</td>';
