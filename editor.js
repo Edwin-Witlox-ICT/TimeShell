@@ -327,7 +327,10 @@ function getHTML() {
     color: var(--accent);
   }
 
-  td.actions-cell { text-align: center; white-space: nowrap; }
+  td.actions-cell { text-align: center; white-space: nowrap; min-width: 70px; }
+
+  /* ── Weekend toggle ── */
+  .hide-weekend .weekend-col { display: none; }
 
   /* ── Footer totals ── */
   tfoot td {
@@ -426,6 +429,7 @@ function getHTML() {
     <button class="btn btn-primary" id="btn-save">Save</button>
     <button class="btn" id="btn-add-entry">+ Add Entry</button>
     <button class="btn" id="btn-new-tpl">New Template</button>
+    <button class="btn" id="btn-toggle-weekend">Hide Weekend</button>
   </div>
 
   <!-- Meta fields -->
@@ -449,8 +453,8 @@ function getHTML() {
           <th class="day-col">Wed</th>
           <th class="day-col">Thu</th>
           <th class="day-col">Fri</th>
-          <th class="day-col">Sat</th>
-          <th class="day-col">Sun</th>
+          <th class="day-col weekend-col" data-day="sat">Sat</th>
+          <th class="day-col weekend-col" data-day="sun">Sun</th>
           <th class="total-col">Total</th>
           <th style="width:40px"></th>
         </tr>
@@ -464,8 +468,8 @@ function getHTML() {
           <td class="day-total" id="total-wed">-</td>
           <td class="day-total" id="total-thu">-</td>
           <td class="day-total" id="total-fri">-</td>
-          <td class="day-total" id="total-sat">-</td>
-          <td class="day-total" id="total-sun">-</td>
+          <td class="day-total weekend-col" id="total-sat">-</td>
+          <td class="day-total weekend-col" id="total-sun">-</td>
           <td class="week-total" id="total-week">-</td>
           <td></td>
         </tr>
@@ -578,12 +582,13 @@ function renderEntries() {
       const h = e.days?.[day] || 0;
       rowTotal += h;
       const cls = h > 0 ? 'has-value' : '';
-      tr.innerHTML += '<td class="day-cell"><input type="number" min="0" max="24" step="0.25" class="field-day ' + cls + '" data-day="' + day + '" value="' + (h || '') + '"></td>';
+      const weekendCls = (day === 'sat' || day === 'sun') ? ' weekend-col' : '';
+      tr.innerHTML += '<td class="day-cell' + weekendCls + '"><input type="number" min="0" max="24" step="0.25" class="field-day ' + cls + '" data-day="' + day + '" value="' + (h || '') + '"></td>';
     }
     // Row total
     tr.innerHTML += '<td class="total-cell row-total">' + (rowTotal || '-') + '</td>';
-    // Delete button
-    tr.innerHTML += '<td class="actions-cell"><button class="btn btn-danger btn-sm btn-delete" title="Remove entry">x</button></td>';
+    // Action buttons
+    tr.innerHTML += '<td class="actions-cell"><button class="btn btn-sm btn-spread" title="Spread total evenly over Mon-Fri">=</button> <button class="btn btn-danger btn-sm btn-delete" title="Remove entry">x</button></td>';
 
     tbody.appendChild(tr);
   }
@@ -594,6 +599,9 @@ function renderEntries() {
   });
   tbody.querySelectorAll('.btn-delete').forEach((btn) => {
     btn.addEventListener('click', onDeleteEntry);
+  });
+  tbody.querySelectorAll('.btn-spread').forEach((btn) => {
+    btn.addEventListener('click', onSpreadEvenly);
   });
 
   updateTotals();
@@ -663,6 +671,33 @@ function onDeleteEntry(e) {
   dirty = true;
 }
 
+function onSpreadEvenly(e) {
+  const tr = e.target.closest('tr');
+  // Sum all current day values in this row
+  let total = 0;
+  tr.querySelectorAll('.field-day').forEach((inp) => {
+    total += parseFloat(inp.value) || 0;
+  });
+  if (total <= 0) return;
+  const perDay = Math.round((total / 5) * 100) / 100; // round to 2 decimals
+  const workdays = ['mon','tue','wed','thu','fri'];
+  tr.querySelectorAll('.field-day').forEach((inp) => {
+    const day = inp.dataset.day;
+    if (workdays.includes(day)) {
+      inp.value = perDay;
+      inp.classList.add('has-value');
+    } else {
+      inp.value = '';
+      inp.classList.remove('has-value');
+    }
+  });
+  // Update row total
+  const rowTotal = perDay * 5;
+  tr.querySelector('.row-total').textContent = rowTotal || '-';
+  updateTotals();
+  dirty = true;
+}
+
 function addEntry() {
   if (!template) return;
   readEntriesFromDOM();
@@ -721,6 +756,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btn-save').addEventListener('click', saveTemplate);
   document.getElementById('btn-add-entry').addEventListener('click', addEntry);
   document.getElementById('btn-new-tpl').addEventListener('click', newTemplate);
+
+  // Weekend toggle
+  const weekendBtn = document.getElementById('btn-toggle-weekend');
+  let weekendHidden = true;
+  document.querySelector('table').classList.add('hide-weekend');
+  weekendBtn.textContent = 'Show Weekend';
+  weekendBtn.addEventListener('click', () => {
+    weekendHidden = !weekendHidden;
+    document.querySelector('table').classList.toggle('hide-weekend', weekendHidden);
+    weekendBtn.textContent = weekendHidden ? 'Show Weekend' : 'Hide Weekend';
+  });
 
   // Ctrl+S
   document.addEventListener('keydown', (e) => {
