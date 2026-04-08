@@ -1,13 +1,17 @@
 {
-  "name": "myweek",
-  "description": "Multi-item weekly template for production",
+  "name": "myweek-spread",
+  "description": "Multi-item weekly template for testing",
   "entries": [
     {
       "jiraId": "SIP-4225",
       "category": "AD",
       "comment": "AD General Work 2026",
       "days": {
-        "fri": 4
+        "mon": 0.8,
+        "tue": 0.8,
+        "wed": 0.8,
+        "thu": 0.8,
+        "fri": 0.8
       }
     },
     {
@@ -15,7 +19,11 @@
       "category": "AD",
       "comment": "AD ASML Sales activities 2026",
       "days": {
-        "fri": 3.25
+        "mon": 0.8,
+        "tue": 0.8,
+        "wed": 0.8,
+        "thu": 0.8,
+        "fri": 0.8
       }
     },
     {
@@ -23,7 +31,11 @@
       "category": "AD",
       "comment": "BUD000943 SMART WH Bazel migration 26Q2",
       "days": {
-        "mon": 4
+        "mon": 0.8,
+        "tue": 0.8,
+        "wed": 0.8,
+        "thu": 0.8,
+        "fri": 0.8
       }
     },
     {
@@ -31,7 +43,11 @@
       "category": "AD",
       "comment": "BUD000948 SMART Silver Bullet 26Q2",
       "days": {
-        "mon": 4
+        "mon": 0.8,
+        "tue": 0.8,
+        "wed": 0.8,
+        "thu": 0.8,
+        "fri": 0.8
       }
     },
     {
@@ -39,7 +55,11 @@
       "category": "AD",
       "comment": "BUD000950 GH Buildrules 26Q2",
       "days": {
-        "tue": 4
+        "mon": 0.8,
+        "tue": 0.8,
+        "wed": 0.8,
+        "thu": 0.8,
+        "fri": 0.8
       }
     },
     {
@@ -47,8 +67,11 @@
       "category": "AD",
       "comment": "BUD000783 ACT/CST Maintenance/Support 26H1",
       "days": {
-        "tue": 4,
-        "thu": 2
+        "mon": 1.2,
+        "tue": 1.2,
+        "wed": 1.2,
+        "thu": 1.2,
+        "fri": 1.2
       }
     },
     {
@@ -56,7 +79,11 @@
       "category": "AD",
       "comment": "BUD000780 IQDS FIaaS WH-DUV 26H1",
       "days": {
-        "wed": 4
+        "mon": 0.8,
+        "tue": 0.8,
+        "wed": 0.8,
+        "thu": 0.8,
+        "fri": 0.8
       }
     },
     {
@@ -64,15 +91,11 @@
       "category": "AD",
       "comment": "BUD000784 FIaaS WH-EUV 26Y1",
       "days": {
-        "wed": 4
-      }
-    },
-    {
-      "jiraId": "xxx",
-      "category": "AD",
-      "comment": "BUD000xxx Team Bridge VIPR Workshop 26Q2",
-      "days": {
-        "thu": 1
+        "mon": 0.8,
+        "tue": 0.8,
+        "wed": 0.8,
+        "thu": 0.8,
+        "fri": 0.8
       }
     },
     {
@@ -80,7 +103,11 @@
       "category": "AD",
       "comment": "Mates CIDT-MCODEX 2026Y1",
       "days": {
-        "thu": 3.75
+        "mon": 0.8,
+        "tue": 0.8,
+        "wed": 0.8,
+        "thu": 0.8,
+        "fri": 0.8
       }
     },
     {
@@ -88,8 +115,11 @@
       "category": "AD",
       "comment": "Mates-HMI-Phase2-2026H1",
       "days": {
-        "thu": 1.25,
-        "fri": 0.75
+        "mon": 0.4,
+        "tue": 0.4,
+        "wed": 0.4,
+        "thu": 0.4,
+        "fri": 0.4
       }
     }
   ]

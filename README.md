@@ -45,6 +45,7 @@ node timeshell.js book --week 14 --template myweek
 | `login` | Interactive Atlassian OAuth login. Session saved to `.auth-state.json`. |
 | `status [--week N] [--year Y]` | Print timetable for a given ISO week. |
 | `book --week N --template FILE [--dry] [--headed]` | Book hours from a template. |
+| `editor [--port N]` | Open the web-based template editor (default port 4000). |
 | `templates` | List available templates. |
 | `categories` | Print valid hour category codes. |
 | `init-template <name>` | Scaffold a new template file. |
@@ -59,6 +60,7 @@ node timeshell.js book --week 14 --template myweek
 | `--template, -t FILE` | Template name or path |
 | `--dry, --dry-run` | Fill forms but don't submit |
 | `--headed, --visible` | Show the browser window |
+| `--port N` | Port for the template editor (default: 4000) |
 
 ## Templates
 
@@ -88,6 +90,26 @@ Templates are JSON files in the `templates/` directory. Each defines a set of Ji
 **Day keys**: `mon`, `tue`, `wed`, `thu`, `fri`, `sat`, `sun` -- omit or set to `0` to skip.
 
 The engine groups consecutive days with the same hours into a single booking to minimize dialog submissions.
+
+## Template editor
+
+A built-in web UI for visually editing templates. No external dependencies -- runs on Node's built-in `http` module.
+
+```bash
+node timeshell.js editor              # http://localhost:4000
+node timeshell.js editor --port 4000  # custom port
+```
+
+Features:
+
+- Spreadsheet-style grid with one row per Jira entry and columns for each day
+- Hour inputs step in 0.25h (15-minute) increments
+- Per-row totals, per-day column totals, and weekly total with color coding
+- **Spread button** (`=`) on each row -- distributes the row's total hours evenly across Mon-Fri
+- **Weekend toggle** -- show or hide Sat/Sun columns (hidden by default)
+- Create new templates, switch between existing ones
+- Ctrl+S to save, with a fixed-position toast confirmation
+- Unsaved-changes warning on page close
 
 ## Category codes
 
@@ -120,6 +142,7 @@ The engine groups consecutive days with the same hours into a single booking to 
 timeshell.js         CLI entry point
 timebox.js           Core booking engine
 auth.js              Login & session management
+editor.js            Web-based template editor (HTTP server + embedded frontend)
 templates/           Booking templates (JSON)
 .auth-state.json     Saved session (gitignored)
 ```

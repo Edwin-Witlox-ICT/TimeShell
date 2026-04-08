@@ -120,7 +120,7 @@
       }
     },
     {
-      "jiraId": "xxx",
+      "jiraId": "FIAAS-3071",
       "category": "AD",
       "comment": "BUD000780 IQDS FIaaS WH-DUV 26H1",
       "days": {
@@ -128,7 +128,7 @@
       }
     },
     {
-      "jiraId": "xxx",
+      "jiraId": "FIAAS-3063",
       "category": "AD",
       "comment": "BUD000784 FIaaS WH-EUV 26Y1",
       "days": {

@@ -266,7 +266,7 @@ Options:
   --template, -t F   Template file (name in templates/ dir, or full path)
   --dry, --dry-run   Fill forms but don't submit
   --headed           Show browser window (default: headless)
-  --port N           Port for the editor UI (default: 3737)
+  --port N           Port for the editor UI (default: 4000)
 
 Examples:
   node timeshell.js login

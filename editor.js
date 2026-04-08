@@ -7,7 +7,7 @@ const path = require('path');
 const { CATEGORIES, DAY_NAMES } = require('./timebox');
 
 const TEMPLATES_DIR = path.join(__dirname, 'templates');
-const DEFAULT_PORT = 3737;
+const DEFAULT_PORT = 4000;
 
 // ─── API helpers ─────────────────────────────────────────────────────
 
@@ -292,7 +292,7 @@ function getHTML() {
     position: sticky;
     top: 0;
   }
-  thead th.day-col { text-align: center; min-width: 56px; }
+  thead th.day-col { text-align: center; min-width: 60px; }
   thead th.total-col { text-align: center; min-width: 60px; color: var(--accent); }
 
   tbody tr { border-bottom: 1px solid var(--border); }
@@ -315,7 +315,7 @@ function getHTML() {
 
   td.day-cell input {
     text-align: center;
-    width: 48px;
+    width: 60px;
     font-variant-numeric: tabular-nums;
   }
   td.day-cell input.has-value { color: var(--green); font-weight: 600; }
@@ -429,6 +429,7 @@ function getHTML() {
     <button class="btn btn-primary" id="btn-save">Save</button>
     <button class="btn" id="btn-add-entry">+ Add Entry</button>
     <button class="btn" id="btn-new-tpl">New Template</button>
+    <button class="btn" id="btn-dup-tpl">Duplicate Template</button>
     <button class="btn" id="btn-toggle-weekend">Hide Weekend</button>
   </div>
 
@@ -445,9 +446,9 @@ function getHTML() {
     <table>
       <thead>
         <tr>
-          <th style="min-width:120px">Jira ID</th>
+          <th style="min-width:100px">Jira ID</th>
           <th style="min-width:100px">Category</th>
-          <th style="min-width:140px">Comment</th>
+          <th style="min-width:160px">Comment</th>
           <th class="day-col">Mon</th>
           <th class="day-col">Tue</th>
           <th class="day-col">Wed</th>
@@ -726,6 +727,35 @@ async function newTemplate() {
   showStatus('Created ' + filename, 'success');
 }
 
+async function duplicateTemplate() {
+  if (!currentFile || !template) return;
+  readEntriesFromDOM();
+  // Generate a unique name with a "-copy", "-copy-2", etc. suffix
+  const baseName = (template.name || currentFile.replace('.json', '')).replace(/-copy(-\\d+)?$/, '');
+  const existingFiles = Array.from(document.getElementById('tpl-select').options).map(o => o.value);
+  let suffix = '-copy';
+  let n = 1;
+  let filename = baseName + suffix + '.json';
+  while (existingFiles.includes(filename)) {
+    n++;
+    suffix = '-copy-' + n;
+    filename = baseName + suffix + '.json';
+  }
+  const newName = baseName + suffix;
+  const dup = JSON.parse(JSON.stringify(template));
+  dup.name = newName;
+  dup.description = (dup.description || '') ? dup.description + ' (copy)' : 'Copy of ' + template.name;
+  await api('/api/templates/' + encodeURIComponent(filename), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dup),
+  });
+  await loadTemplateList();
+  document.getElementById('tpl-select').value = filename;
+  await loadTemplate(filename);
+  showStatus('Duplicated as ' + filename, 'success');
+}
+
 function showStatus(msg, type) {
   const el = document.getElementById('toast');
   el.textContent = (type === 'success' ? 'OK -- ' : '') + msg;
@@ -756,6 +786,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btn-save').addEventListener('click', saveTemplate);
   document.getElementById('btn-add-entry').addEventListener('click', addEntry);
   document.getElementById('btn-new-tpl').addEventListener('click', newTemplate);
+  document.getElementById('btn-dup-tpl').addEventListener('click', duplicateTemplate);
 
   // Weekend toggle
   const weekendBtn = document.getElementById('btn-toggle-weekend');

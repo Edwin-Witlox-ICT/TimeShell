@@ -14,6 +14,7 @@ C:\DEVELOP\TimeShell\
   auth.js              # Login & session management (Atlassian OAuth via browser)
   timebox.js           # Core booking engine (template expansion, calendar, form filling)
   timeshell.js         # CLI entry point
+  editor.js            # Web-based template editor (HTTP server + embedded frontend)
   package.json         # Node.js project (dependency: playwright)
   .auth-state.json     # Saved Playwright storageState (gitignored)
   templates/           # JSON booking templates
@@ -29,6 +30,7 @@ All commands are run with `node timeshell.js <command>`.
 | `login` | Open a headed browser for Atlassian OAuth login. Session is saved to `.auth-state.json`. User completes login manually via 1Password. |
 | `status [--week N] [--year Y]` | Fetch and print the timetable for a given ISO week. |
 | `book --week N --template FILE [--dry] [--headed]` | Book hours from a template. `--dry` fills forms but does not submit. `--headed` shows the browser. |
+| `editor [--port N]` | Open the web-based template editor UI (default port 4000). |
 | `templates` | List all templates in `templates/`. |
 | `categories` | Print valid hour category codes. |
 | `init-template <name>` | Scaffold a new template JSON file. |
@@ -77,6 +79,38 @@ Templates live in `templates/*.json`. Each template has a `name`, optional `desc
 | `PO` | Hours of Product Owner |
 | `PM` | Hours of Project Mgmt |
 
+## Template editor
+
+A built-in web UI (`editor.js`) for visually editing templates. Zero external dependencies -- uses Node's `http` module with an embedded HTML/CSS/JS frontend.
+
+```
+node timeshell.js editor              # http://localhost:4000
+node timeshell.js editor --port 4000  # custom port
+```
+
+### Editor features
+
+- **Grid view**: Spreadsheet-style table with one row per Jira entry, columns for Jira ID, category (dropdown), comment, and Mon-Sun hours
+- **Hour steps**: Inputs step in 0.25h (15-minute) increments
+- **Totals**: Per-row totals, per-day column totals, and weekly total with color coding (green for 8h days, red for >10h)
+- **Spread button** (`=`): Distributes the row's total hours evenly across Mon-Fri, clearing weekend days
+- **Weekend toggle**: Show/hide Sat and Sun columns (hidden by default)
+- **Template management**: Create new templates, switch between existing ones, delete entries
+- **Save**: Ctrl+S or Save button, with a fixed-position toast confirmation in the top-right corner
+- **Unsaved changes**: Browser warns before closing with unsaved edits
+
+### Editor API endpoints
+
+The editor server exposes these local endpoints:
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/api/templates` | GET | List all templates with summary stats |
+| `/api/templates/:file` | GET | Load a template |
+| `/api/templates/:file` | PUT | Save a template |
+| `/api/templates/:file` | DELETE | Delete a template |
+| `/api/categories` | GET | List category codes |
+
 ## How booking works
 
 1. **Template expansion** (`expandTemplate`): Each entry's per-day hours are grouped into consecutive-day ranges sharing the same hour value. This minimizes the number of dialog submissions (e.g., Mon-Fri at 8h becomes one booking instead of five).
@@ -113,6 +147,7 @@ Use this skill when:
 
 - The user asks to book, log, or fill in hours/time on time-box.eu
 - The user wants to create, edit, or validate a booking template
+- The user wants to use or modify the template editor web UI
 - The user asks about the status of their timetable for a given week
 - The user wants to modify the booking engine behavior (calendar interaction, form filling, template expansion)
 - The user mentions TimeShell, timebox, or time tracking automation
@@ -123,6 +158,8 @@ Use this skill when:
 ```
 node timeshell.js login          # Interactive browser login
 node timeshell.js status         # Verify session works
+node timeshell.js editor         # Open template editor at http://localhost:4000
+# Or create from CLI:
 node timeshell.js init-template myweek
 # Edit templates/myweek.json with real Jira IDs
 ```
